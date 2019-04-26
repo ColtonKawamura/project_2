@@ -1,58 +1,60 @@
+#--------Task 1----------------
+V <- 200
+U <- 5
+R <- 2
+rho_initial <- 20
+theta_initial <- 0
 
-eps_n_eff = linspace(0,1,100)
+#Maximum time late
+tau_max <- (1/U)*(R*V/(pi*U)-R); tau_max
 
-A = 90 %MPa, Table 2.1
-B =  292 %MPa, Table 2.1
-%eps_n_eff = sqrt(2)/3*sqrt((eps_x-eps_y)^2+(eps_y-eps_z)^2+(eps_y-eps_x)^2)
-work_hardening = A+B*eps_n_eff
+#Maximum Rho
+rho_max <- tau_max*U+R; rho_max
 
+#Tau
+tau <- rho_initial/(U+R); tau
 
-eps_dot = 1 % Given in problem
-eps_0_dot = 1 %from Table 2.1 comment
-C = .025 %Table 2.1
-strain_rate_hardening = 1+C*log(eps_dot/eps_0_dot)
+#Time Required to Trap
+if (tau_max > tau) {
+  print("A Trap is Possible")
+  t_required <- (1/U)*(rho_max*log((rho_max-R)/(rho_max-rho_initial))-rho_initial+R)
+} else
+  print("A Trap is Not Possible")
+t_required
 
-%Reference temperature
-T_r = 294 %Kelvin, last line of page 35
+#--------Task 2----------------
 
-%Melt Temperature
-T_m = 1356 %Kelivin, Table 2.1
-
-%Temperature
-T=  300 %Kelvin, Given
-
-m = 1.09 %Table 2.1
-
-T_star = (T - T_r)/(T_m-T_r)
-thermal_softening = 1-T_star^m
-
-
-sigma_p_1_300 = (work_hardening)*(strain_rate_hardening)*(thermal_softening)
-
-
-eps_dot = 1E4
-strain_rate_hardening = 1+C*log(eps_dot/eps_0_dot)
-sigma_p_1E4_300 = (work_hardening)*(strain_rate_hardening)*(thermal_softening)
-
-eps_dot = 1
-T=  1000 %Kelvin, Given
-strain_rate_hardening = 1+C*log(eps_dot/eps_0_dot)
-T_star = (T - T_r)/(T_m-T_r)
-thermal_softening = 1-T_star^m
-sigma_p_1_1000 = (work_hardening)*(strain_rate_hardening)*(thermal_softening)
-
-eps_dot = 1E7
-T=  800 %Kelvin, Given
-strain_rate_hardening = 1+C*log(eps_dot/eps_0_dot)
-T_star = (T - T_r)/(T_m-T_r)
-thermal_softening = 1-T_star^m
-sigma_p_1E7_800 = (work_hardening)*(strain_rate_hardening)*(thermal_softening)
-
-plot(eps_n_eff,sigma_p_1_300,'b-')
-title('Yield Surface σp(ε) of OFHC Copper')
-xlabel('Strain εeff') %label of the x axis
-ylabel('Yield Surface σp(ε)') %label of the y axis
-hold on
-plot(eps_n_eff,sigma_p_1E4_300, 'r-')
-plot(eps_n_eff,sigma_p_1_1000, 'g-')
-plot(eps_n_eff,sigma_p_1E7_800, 'black-')
+#Creating a spiral plot
+# Input parameters
+u <- U
+v <- V
+rho0 <- rho_initial
+theta0 <- theta_initial
+# Maximum trapping distance, and time when rho has decreased to R.
+rhomax <- R*v/pi/u
+tmax <- (1/u)*(rhomax*log((rhomax-R)/(rhomax-rho0))-rho0+R)
+dt <- .1/60
+# Equations of motion; i.e., the derivative of the state (rho, theta)
+# as a function of the state.
+drho <- function(rho) u - R*v/(pi*rho)
+dtheta <- function(rho,drho) sqrt(v^2 - drho^2)/rho
+# Initialize (rho, theta), time,  and output vectors
+rho_out <- rho <- rho0
+theta_out <- theta <- theta0
+t <- 0
+# Euler’s Method
+while (t < tmax & rho > R) {
+   rho_new <- rho + drho(rho) * dt
+   theta_new <- theta + dtheta(rho,drho(rho)) * dt
+   rho_out <- c(rho_out,rho_new)
+   theta_out <- c(theta_out,theta_new)
+   t <- t + dt
+   rho <- rho_new
+   theta <- theta_new
+}
+# Compute and plot x and y values
+x <- rho_out*sin(theta_out)
+y <- rho_out*cos(theta_out)
+plot(x, y,type = "l", asp = 1, ,xlim=c(-30,30), ylim=c(-20,20)); grid()
+text(0,6.5,paste("rhomax",round(rhomax,2)),cex=.8)
+text(0,5.5,paste("tmax",round(tmax,3)),cex=.8)

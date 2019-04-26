@@ -57,6 +57,9 @@ x <- rho_out*sin(theta_out)
 y <- rho_out*cos(theta_out)
 plot(x, y,type = "l", asp = 1, ,xlim=c(-30,30), ylim=c(-20,20)); grid()
 text(0,6.5,paste("rhomax",round(rhomax,2)),cex=.8)
+library(plotrix)
+draw.ellipse(x[1],y[1],R,R,border="red")
+draw.ellipse(x[length(x)],y[length(y)],R,R,border="red")
 #--------Task 3----------------
 # Input parameters
 u <- U

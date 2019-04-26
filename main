@@ -58,3 +58,191 @@ y <- rho_out*cos(theta_out)
 plot(x, y,type = "l", asp = 1, ,xlim=c(-30,30), ylim=c(-20,20)); grid()
 text(0,6.5,paste("rhomax",round(rhomax,2)),cex=.8)
 text(0,5.5,paste("tmax",round(tmax,3)),cex=.8)
+
+library(plotrix)
+draw.ellipse(x[1],y[1],R,R,border="red")
+draw.ellipse(x[length(x)],y[length(y)],R,R,border="red")
+
+#----------Task 3----------------------
+#----------Task 4----------------------
+# Generate Search Path
+rho0=20
+R=2
+v=200
+u=5
+theta0=0
+# Maximum trapping distance, and time when rho has decreased to R.
+rhomax <- R*v/pi/u
+tmax <- (1/u)*(rhomax*log((rhomax-R)/(rhomax-rho0))-rho0+R)
+dt <- .1/60
+# Equations of motion; i.e., the derivative of the state (rho, theta)
+# as a function of the state.
+drho <- function(rho) u - R*v/(pi*rho)
+dtheta <- function(rho,drho) sqrt(v^2 - drho^2)/rho
+# Initialize (rho, theta), time,  and output vectors
+rho_out <- rho <- rho0
+theta_out <- theta <- theta0
+t <- 0
+# Euler’s Method
+while (t < tmax & rho > R) {
+  rho_new <- rho + drho(rho) * dt
+  theta_new <- theta + dtheta(rho,drho(rho)) * dt
+  rho_out <- c(rho_out,rho_new)
+  theta_out <- c(theta_out,theta_new)
+  t <- t + dt
+  rho <- rho_new
+  theta <- theta_new
+}
+# Compute x and y values
+xs <- rho_out*sin(theta_out)
+ys <- rho_out*cos(theta_out)
+#plot(xs,ys,cex=0.1)
+
+# Generate Random Targets
+nreps=1000 #takes a really long time to run with 1000
+rho0=20
+R=2
+tgtxinit=NULL
+tgtyinit=NULL
+dist=NULL
+count=NULL
+t=0
+xs=xs[1:length(xs)-1]
+ys=ys[1:length(ys)-1]
+for (i in 1:nreps) {
+  init.tgt.rho=(rho0-R)*sqrt(runif(1))
+  init.tgt.theta=2*pi*runif(1)
+  tgtxinit[i]=init.tgt.rho*sin(init.tgt.theta)
+  tgtyinit[i]=init.tgt.rho*cos(init.tgt.theta)
+  rho_t=init.tgt.rho
+  rho_t_out=NULL
+  theta_t_out=NULL
+  t=0
+  while (t < tmax) {
+    rho_t_new=rho_t+u*dt
+    theta_t_new=init.tgt.theta
+    rho_t_out=c(rho_t_out,rho_t_new)
+    theta_t_out=c(theta_t_out,theta_t_new)
+    rho_t=rho_t_new
+    t=t+dt
+  }
+  # calculate x,y of target
+  xt = rho_t_out*sin(theta_t_out)
+  yt = rho_t_out*cos(theta_t_out)
+  dist[i]=min(sqrt((xt-xs)^2+(yt-ys)^2))
+  if (dist[i]<=R) {
+    count[i]=1
+  } else {
+    count[i]=0
+  }
+}
+
+plot(xs, ys,type = "l",xlab="X (nm)",ylab="Y (nm)",
+     main="1000 Uniformly Distributed Targets")
+points(tgtxinit,tgtyinit,cex=.5,col="red")
+draw.ellipse(0,0,18,18)
+draw.ellipse(xs[1],ys[1],R,R,border="blue")
+draw.ellipse(xs[length(xs)],ys[length(ys)],R,R,border="blue")
+text(-14,-18, paste0("Targets Detected: "))
+text(-14,-19.2, paste0(sum(count)))
+
+#----------Task 5----------------------
+# Generate Search Path
+rho0=20
+R=2
+v=200
+u=5
+theta0=0
+# Maximum trapping distance, and time when rho has decreased to R.
+rhomax <- R*v/pi/u
+tmax <- (1/u)*(rhomax*log((rhomax-R)/(rhomax-rho0))-rho0+R)
+dt <- .1/60
+# Equations of motion; i.e., the derivative of the state (rho, theta)
+# as a function of the state.
+drho <- function(rho) u - R*v/(pi*rho)
+dtheta <- function(rho,drho) sqrt(v^2 - drho^2)/rho
+# Initialize (rho, theta), time,  and output vectors
+rho_out <- rho <- rho0
+theta_out <- theta <- theta0
+t <- 0
+# Euler’s Method
+while (t < tmax & rho > R) {
+  rho_new <- rho + drho(rho) * dt
+  theta_new <- theta + dtheta(rho,drho(rho)) * dt
+  rho_out <- c(rho_out,rho_new)
+  theta_out <- c(theta_out,theta_new)
+  t <- t + dt
+  rho <- rho_new
+  theta <- theta_new
+}
+# Compute x and y values
+xs <- rho_out*sin(theta_out)
+ys <- rho_out*cos(theta_out)
+#plot(xs,ys,cex=0.1)
+
+# Generate Random Targets at different speeds
+ut=seq(5,15)
+PD=NULL
+ME=NULL
+xs=xs[1:length(xs)-1]
+ys=ys[1:length(ys)-1]
+for (j in 1:length(ut)) {
+  nreps=2000 #takes a really long time to run with 10000
+  rho0=20
+  R=2
+  tgtxinit=NULL
+  tgtyinit=NULL
+  dist=NULL
+  count=NULL
+  t=0
+  for (i in 1:nreps) {
+    init.tgt.rho=(rho0-R)*sqrt(runif(1))
+    init.tgt.theta=2*pi*runif(1)
+    tgtxinit[i]=init.tgt.rho*sin(init.tgt.theta)
+    tgtyinit[i]=init.tgt.rho*cos(init.tgt.theta)
+    rho_t=init.tgt.rho
+    rho_t_out=NULL
+    theta_t_out=NULL
+    t=0
+    while (t < tmax) {
+      rho_t_new=rho_t+ut[j]*dt
+      theta_t_new=init.tgt.theta
+      rho_t_out=c(rho_t_out,rho_t_new)
+      theta_t_out=c(theta_t_out,theta_t_new)
+      rho_t=rho_t_new
+      t=t+dt
+    }
+    # calculate x,y of target
+    xt = rho_t_out*sin(theta_t_out)
+    yt = rho_t_out*cos(theta_t_out)
+    dist[i]=min(sqrt((xt-xs)^2+(yt-ys)^2))
+    if (dist[i]<=R) {
+      count[i]=1
+    } else {
+      count[i]=0
+    }
+  }
+  PD[j]=sum(count)/nreps
+  ME[j]=qnorm(.975)*sd(count)/sqrt(nreps)
+}
+PD
+ME
+
+plot(ut,PD,col="red",
+     ylab="Probability of Damage",xlab="Actual Target Speed (Ua)",
+     ylim=c(0,1),xaxs="i",yaxs="i")
+text(7,0.6, paste0("95%CI: ", round(PD[3], 3), " +/- ", round(ME[3], 3)))
+text(7,0.65,paste0("Ua = 7kt"))
+text(7,0.5,paste0("Actual tgt. speed: 5-15 kt"))
+text(7,0.45,paste0("Search speed: 200 kt"))
+text(7,0.4,paste0("Detection Range: 2 nm"))
+text(7,0.35,paste0("Assumed tgt. speed: 5 kt"))
+text(7,0.3,paste0("2000 Monte Carl reps."))
+text(7,0.25,paste0("95% conf. intervals"))
+text(11,0.2,paste0("Initial Conditions:"))
+text(11,0.15,paste0("Searcher: Rho: 20 nm, Theta: North"))
+text(11,0.1,paste0("Target: Uniform over 18 nm radius disk"))
+text(11,0.05,paste0("centered on datum (0,0)"))
+lines(ut,PD+ME,lty=2,col="red")
+lines(ut,PD-ME,lty=2,col="red")
+grid()

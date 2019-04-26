@@ -52,14 +52,51 @@ while (t < tmax & rho > R) {
    rho <- rho_new
    theta <- theta_new
 }
+
 # Compute and plot x and y values
 x <- rho_out*sin(theta_out)
 y <- rho_out*cos(theta_out)
-plot(x, y,type = "l", asp = 1, ,xlim=c(-30,30), ylim=c(-20,20)); grid()
+plot(x, y,type = "l", asp = 1, ,xlim=c(-30,30), ylim=c(-20,20),xlab="", ylab=""); grid()
 text(0,6.5,paste("rhomax",round(rhomax,2)),cex=.8)
+text(0,5.5,paste("tmax",round(tmax,3)),cex=.8)
 library(plotrix)
 draw.ellipse(x[1],y[1],R,R,border="red")
 draw.ellipse(x[length(x)],y[length(y)],R,R,border="red")
+
+x <- 1
+repeat {
+#Target 1
+rho0 <- (18)*sqrt(runif(1))
+theta0 <- 2*pi*runif(1)
+dt <- .1/60
+# Equations of motion; i.e., the derivative of the state (rho, theta)
+
+dtheta <- 0
+# Initialize (rho, theta), time,  and output vectors
+rho_out <- rho <- rho0
+theta_out <- theta <- theta0
+t <- t_out <- 0
+# Euler’s Method
+while (t < tmax & rho < 20) {
+   rho_new <- rho + u*dt
+   rho_out <- c(rho_out,rho_new)
+   t_new <- t + dt
+   t_out <- c(t_out,t_new)
+   t <- t_new
+   rho <- rho_new
+}
+# Compute and plot x and y values
+x_target1 <- rho_out*sin(theta0)
+y_target1 <- rho_out*cos(theta0)
+
+points(x_target1[1],y_target1[1], pch=19, col='green')
+points(x_target1,y_target1,type='l', col='grey')
+x = x+1
+if (x == 20){
+break
+}
+}
+
 #--------Task 3----------------
 # Input parameters
 u <- U

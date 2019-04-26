@@ -58,7 +58,6 @@ y <- rho_out*cos(theta_out)
 plot(x, y,type = "l", asp = 1, ,xlim=c(-30,30), ylim=c(-20,20)); grid()
 text(0,6.5,paste("rhomax",round(rhomax,2)),cex=.8)
 #--------Task 3----------------
-
 # Input parameters
 u <- U
 v <- V
@@ -88,7 +87,10 @@ y_target <- rho_out*cos(theta0)
 #Compute the Distance between the Searcher and the Target
 r <- sqrt((x[1:length(rho_out)]-x_target)^2+(y[1:length(rho_out)]-y_target)^2)
 
-plot(t_out, r,type = "l", xlim=c(0,4), ylim=c(0,40)); grid()
+plot(t_out, r,type = "l", xlim=c(0,4), ylim=c(0,40),xlab="Time", ylab="Target Range"); grid()
+text(3.5,10,paste("Det. Range (R) = 2 nm "),cex=.8)
+text(3.5,8,paste("Min. Targ. Range=",round(min(r),3)),cex=.8)
+abline(h=2,col="red")
 #----------Task 4----------------------
 	# Generate Search Path
 	rho0=20

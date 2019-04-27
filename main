@@ -63,7 +63,7 @@ library(plotrix)
 draw.ellipse(x[1],y[1],R,R,border="red")
 draw.ellipse(x[length(x)],y[length(y)],R,R,border="red")
 
-x <- 1
+zz <- 1
 repeat {
 #Target 1
 rho0 <- (18)*sqrt(runif(1))
@@ -85,14 +85,14 @@ while (t < tmax & rho < 20) {
    t <- t_new
    rho <- rho_new
 }
-# Compute and plot x and y values
+# Compute and plot zz and y values
 x_target1 <- rho_out*sin(theta0)
 y_target1 <- rho_out*cos(theta0)
 
 points(x_target1[1],y_target1[1], pch=19, col='green')
 points(x_target1,y_target1,type='l', col='grey')
-x = x+1
-if (x == 20){
+zz = zz+1
+if (zz == 20){
 break
 }
 }
